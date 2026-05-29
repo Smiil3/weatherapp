@@ -1,134 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'feature/weather/screens/home_screen.dart';
+import 'theme/app_colors.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const WeatherApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class WeatherApp extends StatelessWidget {
+  const WeatherApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Weather App'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _cityController = TextEditingController();
-  String _weatherText = '';
-  bool _loading = false;
-
-  Future<void> fetchWeather(String city) async {
-    setState(() {
-      _loading = true;
-      _weatherText = 'Loading...';
-    });
-
-    try {
-      final url = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=055e78f2005f9e43d2031b711a8973d8&units=metric',
-      );
-
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        final temp = data['main']['temp'];
-        final description = data['weather'][0]['description'];
-
-        setState(() {
-          _weatherText = 'Temperature: $temp°C\nCondition: $description';
-        });
-      } else {
-        setState(() {
-          _weatherText =
-          'Error: ${response.statusCode} - ${response.reasonPhrase}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _weatherText = 'Failed to fetch weather: $e';
-      });
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            Text(
-              'Weather App',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              child:
-              TextField(
-                controller: _cityController,
-                decoration: InputDecoration(
-                  hintText: 'Enter a city',
-                ),
-              ),
+      title: 'Météo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: AppColors.bgDeep,
+        colorScheme: const ColorScheme.dark(
+          primary:   AppColors.skyBlue,
+          secondary: AppColors.iceBlue,
+          surface:   AppColors.bgCard,
+          error:     AppColors.error,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.bgMid,
+          foregroundColor: AppColors.textPrimary,
+          elevation: 0,
+          titleTextStyle: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+          iconTheme: IconThemeData(color: AppColors.iconPrimary),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.skyBlue,
+            foregroundColor: AppColors.bgDeep,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(14)),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurpleAccent,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: _loading
-                  ? null
-                  : () {
-                final city = _cityController.text.trim();
-                if (city.isEmpty) {
-                  setState(() {
-                    _weatherText = 'Please enter a city name.';
-                  });
-                  return;
-                }
-                fetchWeather(city);
-              },
-              child: Text('Search'),
-            ),
-            Text(
-              _weatherText,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
-            ),
-          ],
+            textStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.bgGlass,
+          hintStyle: TextStyle(color: AppColors.textMuted),
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(14)),
+            borderSide: BorderSide(color: AppColors.border),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(14)),
+            borderSide: BorderSide(color: AppColors.border),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(14)),
+            borderSide: BorderSide(color: AppColors.skyBlue, width: 1.5),
+          ),
+        ),
+        cardTheme: CardThemeData(
+          color: AppColors.bgCard,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            side: BorderSide(color: AppColors.border),
+          ),
+        ),
+        dividerTheme: const DividerThemeData(color: AppColors.divider),
+        textTheme: const TextTheme(
+          bodyLarge:   TextStyle(color: AppColors.textPrimary),
+          bodyMedium:  TextStyle(color: AppColors.textSecondary),
+          titleLarge:  TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+          titleMedium: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+          labelSmall:  TextStyle(color: AppColors.textMuted),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.iconPrimary),
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: AppColors.bgCard,
+          contentTextStyle: TextStyle(color: AppColors.textPrimary),
         ),
       ),
+      home: HomeScreen(),
     );
   }
 }
